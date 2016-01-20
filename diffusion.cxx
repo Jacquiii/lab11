@@ -24,7 +24,7 @@ int main(){
   const double xmax = 20;
   const double dx = (xmax-xmin)/(N-1) ;
 
-  double dt = dx;
+  double dt = .5*dx;
   double t = 0;
   const int Na = 10;
   const int Nk = int(tEnd/Na/dt);
@@ -76,7 +76,18 @@ void step(double* const f1, double* const f0,
   for(int i=0;i<N;i++) d[i] = 1.0 + 2.0*D*dt/(dx*dx);
   for(int i=0;i<N;i++) u[i] = - D*dt/(dx*dx);
   for(int i=0;i<N;i++) l[i] = - D*dt/(dx*dx);
-
+  
+  for(int i=0;i<N-1;i++){
+    double c = l[i+1]/d[i];
+    d[i+1]=d[i+1]- c *u[i];
+    l[i+1]=0;
+    
+    f0[i+1]=f0[i+1]-c*f0[i];
+  }
+    //Backward substitution
+  f1[N-1]=f0[N-1]/d[N-1];
+  for(int i=1; i<N-1; i++)  
+    f1[N-1-i]=(f0[N-1-i]-f1[N-i]*u[N-i-1])/d[N-1-i];
 
   delete[] d;
   delete[] u;
